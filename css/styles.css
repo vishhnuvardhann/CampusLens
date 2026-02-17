@@ -1,0 +1,225 @@
+/* Futuristic HUD Variables */
+:root {
+    --neon-blue: #00f3ff;
+    --neon-alert: #ff0055;
+    --glass-bg: rgba(10, 20, 30, 0.6);
+    --glass-border: rgba(0, 243, 255, 0.3);
+    --font-heading: 'Orbitron', sans-serif;
+    --font-body: 'Rajdhani', sans-serif;
+}
+
+body {
+    margin: 0;
+    overflow: hidden;
+    font-family: var(--font-body);
+    color: white;
+}
+
+/* HUD Container */
+#ar-hud {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+    pointer-events: none;
+    /* Allow interaction with 3D scene if needed */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* Header */
+.hud-header {
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.8) 0%, transparent 100%);
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    backdrop-filter: blur(2px);
+}
+
+.logo {
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    font-weight: 900;
+    letter-spacing: 2px;
+    text-shadow: 0 0 10px var(--neon-blue);
+}
+
+.logo .highlight {
+    color: var(--neon-blue);
+}
+
+.system-status {
+    font-size: 0.9rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--neon-blue);
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    background-color: var(--neon-blue);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--neon-blue);
+    animation: pulse 2s infinite;
+}
+
+/* Footer */
+.hud-footer {
+    background: linear-gradient(0deg, rgba(0, 0, 0, 0.9) 0%, transparent 100%);
+    padding: 20px 30px;
+    display: flex;
+    justify-content: space-between;
+    backdrop-filter: blur(4px);
+    border-top: 1px solid var(--glass-border);
+}
+
+.location-info,
+.distance-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.label {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.7);
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+}
+
+.value {
+    font-family: var(--font-heading);
+    font-size: 1.2rem;
+    font-weight: 700;
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+}
+
+/* Scanning Overlay (Center) */
+.scanning-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 250px;
+    height: 250px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.reticle {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.corner {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--neon-blue);
+    box-shadow: 0 0 5px var(--neon-blue);
+}
+
+.top-left {
+    top: -2px;
+    left: -2px;
+    border-right: none;
+    border-bottom: none;
+}
+
+.top-right {
+    top: -2px;
+    right: -2px;
+    border-left: none;
+    border-bottom: none;
+}
+
+.bottom-left {
+    bottom: -2px;
+    left: -2px;
+    border-right: none;
+    border-top: none;
+}
+
+.bottom-right {
+    bottom: -2px;
+    right: -2px;
+    border-left: none;
+    border-top: none;
+}
+
+.scan-line {
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--neon-blue), transparent);
+    animation: scan 3s ease-in-out infinite;
+    top: 50%;
+}
+
+.scan-text {
+    position: absolute;
+    bottom: -30px;
+    font-size: 0.9rem;
+    letter-spacing: 2px;
+    color: var(--neon-blue);
+    animation: blink 1.5s infinite;
+}
+
+/* Animations */
+@keyframes pulse {
+    0% {
+        opacity: 1;
+        box-shadow: 0 0 8px var(--neon-blue);
+    }
+
+    50% {
+        opacity: 0.5;
+        box-shadow: 0 0 2px var(--neon-blue);
+    }
+
+    100% {
+        opacity: 1;
+        box-shadow: 0 0 8px var(--neon-blue);
+    }
+}
+
+@keyframes scan {
+    0% {
+        top: 10%;
+        opacity: 0;
+    }
+
+    20% {
+        opacity: 1;
+    }
+
+    80% {
+        opacity: 1;
+    }
+
+    100% {
+        top: 90%;
+        opacity: 0;
+    }
+}
+
+@keyframes blink {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.3;
+    }
+}
