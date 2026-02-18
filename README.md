@@ -1,13 +1,14 @@
 # CampusLens AR Navigation
 
 A futuristic WebVR-based Augmented Reality campus navigation interface using A-Frame and AR.js.
+You access this through https://vishhnuvardhann.github.io/CampusLens/ link
 
 ## Features
 - **Immersive AR**: Detects "Hiro" and "Kanji" markers to show 3D navigation arrows.
 - **Futuristic HUD**: Glassmorphism UI with scanning reticles and neon aesthetics.
 - **Dynamic Feedback**: Real-time status updates ("System Online", "Target Locked").
 
-## How to Run
+## How to Run it locally
 ⚠️ **Important**: WebXR/AR requires the site to be served via **HTTPS** or **localhost**.
 
 ### Option 1: VS Code Live Server (Recommended)
