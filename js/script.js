@@ -1,103 +1,165 @@
 /**
- * CampusLens AR Navigation System
- * Handles AR marker detection and HUD updates.
+ * CampusLens: AR Navigation System
+ * Handles AR marker detection, directional logic, and HUD updates.
  */
 
-// Register custom A-Frame component for marker events
-// Must be registered before the scene loads or entities are created
-AFRAME.registerComponent('marker-handler', {
+// Register custom A-Frame component
+AFRAME.registerComponent('campus-marker', {
     init: function () {
-        // Cache DOM elements for performance
-        this.scanningOverlay = document.querySelector('.scanning-overlay');
-        this.targetNameConfig = document.getElementById('target-name');
-        this.distanceDisplay = document.getElementById('target-distance');
+        // Cache UI elements
+        this.statusText = document.getElementById('status-text');
+        this.reticle = document.getElementById('scanning-reticle');
+        this.infoPanel = document.getElementById('info-panel');
+        this.locName = document.getElementById('location-name');
+        this.locDist = document.getElementById('location-distance');
+        this.navInstruction = document.getElementById('nav-instruction');
 
+        // Bind events
         this.el.addEventListener('markerFound', () => {
-            console.log("Target Locked: " + this.el.id);
-            this.updateHUD(true, this.el.getAttribute('data-name'), this.el.getAttribute('data-distance'));
+            const name = this.el.getAttribute('data-name');
+            const dist = this.el.getAttribute('data-dist');
+            const instruction = this.el.getAttribute('data-instruction');
+
+            console.log(`Target Locked: ${name}`);
+            this.onMarkerFound(name, dist, instruction);
         });
 
         this.el.addEventListener('markerLost', () => {
             console.log("Target Lost");
-            this.updateHUD(false);
+            this.onMarkerLost();
         });
     },
 
-    updateHUD: function (found, name, distance) {
-        if (found) {
-            if (this.scanningOverlay) this.scanningOverlay.style.opacity = '0.2';
-            if (this.targetNameConfig) {
-                this.targetNameConfig.innerText = name || "UNKNOWN TARGET";
-                this.targetNameConfig.style.color = "var(--neon-blue)";
-            }
-            if (this.distanceDisplay) this.distanceDisplay.innerText = distance || "CALCULATING...";
-
-            document.documentElement.style.setProperty('--glass-border', 'rgba(0, 243, 255, 0.8)');
-        } else {
-            if (this.scanningOverlay) this.scanningOverlay.style.opacity = '1';
-            if (this.targetNameConfig) {
-                this.targetNameConfig.innerText = "NO MARKER DETECTED";
-                this.targetNameConfig.style.color = "white";
-            }
-            if (this.distanceDisplay) this.distanceDisplay.innerText = "-- M";
-
-            document.documentElement.style.setProperty('--glass-border', 'rgba(0, 243, 255, 0.3)');
+    onMarkerFound: function (name, dist, instruction) {
+        // Update Status
+        if (this.statusText) {
+            this.statusText.innerText = "NAVIGATION ACTIVE // FOLLOWING PATH";
+            this.statusText.style.color = "var(--neon-blue)";
         }
+
+        // Hide Scanning Reticle
+        if (this.reticle) this.reticle.classList.add('hidden');
+
+        // Show Info Panel
+        if (this.infoPanel) {
+            this.locName.innerText = name;
+            this.locDist.innerText = dist;
+            if (this.navInstruction) this.navInstruction.innerText = instruction;
+            this.infoPanel.classList.remove('hidden');
+        }
+    },
+
+    onMarkerLost: function () {
+        // Update Status
+        if (this.statusText) {
+            this.statusText.innerText = "SYSTEM ONLINE // SCANNING...";
+            this.statusText.style.color = "var(--neon-blue)";
+        }
+
+        // Show Scanning Reticle
+        if (this.reticle) this.reticle.classList.remove('hidden');
+
+        // Hide Info Panel
+        if (this.infoPanel) this.infoPanel.classList.add('hidden');
     }
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("CampusLens System Online...");
+    console.log("CampusLens Navigation Initialized");
 
-    // Initialize HUD elements
-    const statusText = document.querySelector('.system-status');
-
-    // Simulate system boot sequence
-    setTimeout(() => {
-        if (statusText) statusText.innerHTML = '<span class="status-dot"></span> SYSTEM READY';
-    }, 1500);
-
-    // Add Markers to Scene
     const scene = document.querySelector('a-scene');
 
-    // Define Destinations
-    const destinations = [
-        { id: "marker-library", preset: "hiro", name: "CENTRAL LIBRARY", distance: "45 M", color: "#00f3ff" },
-        { id: "marker-lab", preset: "kanji", name: "ROBOTICS LAB", distance: "120 M", color: "#ff0055" }
+    // Define Targets with Navigation Logic
+    // Rotation: x y z (Forward=0 0 0, Right=0 -90 0, Left=0 90 0, Back=0 180 0)
+    // Note: A-Frame rotations are in degrees. 
+    const targets = [
+        {
+            id: "target-library",
+            preset: "hiro",
+            name: "Central Library",
+            dist: "45m",
+            color: "#00f3ff",
+            instruction: "GO STRAIGHT",
+            rotation: "0 0 0"
+        },
+        {
+            id: "target-lab",
+            preset: "kanji",
+            name: "Robotics Lab",
+            dist: "120m",
+            color: "#ff2a2a",
+            instruction: "TURN RIGHT",
+            rotation: "0 -90 0"
+        }
     ];
 
     if (scene) {
-        destinations.forEach(dest => {
+        targets.forEach(t => {
+            // Create Marker
             const marker = document.createElement('a-marker');
-            marker.setAttribute('preset', dest.preset);
-            marker.setAttribute('id', dest.id);
-            marker.setAttribute('marker-handler', '');
-            marker.setAttribute('data-name', dest.name);
-            marker.setAttribute('data-distance', dest.distance);
+            marker.setAttribute('preset', t.preset);
+            marker.setAttribute('id', t.id);
+            marker.setAttribute('campus-marker', '');
+            marker.setAttribute('data-name', t.name);
+            marker.setAttribute('data-dist', t.dist);
+            marker.setAttribute('data-instruction', t.instruction);
 
-            // Add 3D Navigation Arrow
-            const arrow = document.createElement('a-entity');
-            arrow.setAttribute('geometry', 'primitive: cone; radiusBottom: 0.2; radiusTop: 0; height: 1');
-            arrow.setAttribute('material', `color: ${dest.color}; transparent: true; opacity: 0.8; metalness: 0.5; roughness: 0.2`);
-            arrow.setAttribute('position', '0 1 0');
-            arrow.setAttribute('rotation', '180 0 0'); // Point down
+            // Container for 3D Elements
+            const navContainer = document.createElement('a-entity');
 
-            // Add Animation
-            arrow.setAttribute('animation', 'property: position; to: 0 1.2 0; dir: alternate; dur: 1000; loop: true; easing: easeInOutSine');
-            arrow.setAttribute('animation__spin', 'property: rotation; to: 180 360 0; loop: true; dur: 5000; easing: linear');
+            // 1. Directional Arrow (Cone + Cylinder)
+            const arrowGroup = document.createElement('a-entity');
+            arrowGroup.setAttribute('position', '0 1 0');
+            arrowGroup.setAttribute('rotation', t.rotation); // Apply navigation direction
 
-            // Add Glow Ring
-            const ring = document.createElement('a-entity');
-            ring.setAttribute('geometry', 'primitive: ring; radiusInner: 0.5; radiusOuter: 0.6');
-            ring.setAttribute('material', `color: ${dest.color}; shader: flat; side: double`);
-            ring.setAttribute('position', '0 0.1 0');
+            // Arrow Shaft
+            const shaft = document.createElement('a-cylinder');
+            shaft.setAttribute('radius', '0.1');
+            shaft.setAttribute('height', '1');
+            shaft.setAttribute('position', '0 0 0.5'); // Offset to align with head
+            shaft.setAttribute('rotation', '90 0 0'); // Lay flat
+            shaft.setAttribute('material', `color: ${t.color}; emissive: ${t.color}; emissiveIntensity: 0.6; opacity: 0.9`);
+
+            // Arrow Head
+            const head = document.createElement('a-cone');
+            head.setAttribute('radius-bottom', '0.3');
+            head.setAttribute('radius-top', '0');
+            head.setAttribute('height', '0.6');
+            head.setAttribute('position', '0 0 -0.4'); // Tip forward
+            head.setAttribute('rotation', '-90 0 0'); // Point forward
+            head.setAttribute('material', `color: ${t.color}; emissive: ${t.color}; emissiveIntensity: 0.8; opacity: 1`);
+
+            arrowGroup.appendChild(shaft);
+            arrowGroup.appendChild(head);
+
+            // Animate entire arrow group (Float up/down)
+            arrowGroup.setAttribute('animation', 'property: position; to: 0 1.2 0; dir: alternate; dur: 1500; easing: easeInOutSine; loop: true');
+
+            // 2. Floating Instruction Text
+            const textLabel = document.createElement('a-text');
+            textLabel.setAttribute('value', t.instruction);
+            textLabel.setAttribute('align', 'center');
+            textLabel.setAttribute('position', '0 2 0'); // Above arrow
+            textLabel.setAttribute('scale', '1.5 1.5 1.5');
+            textLabel.setAttribute('color', t.color);
+            textLabel.setAttribute('look-at', '[camera]'); // Always face user
+
+            // 3. Ground Pulse Ring
+            const ring = document.createElement('a-ring');
+            ring.setAttribute('radius-inner', '0.8');
+            ring.setAttribute('radius-outer', '0.9');
+            ring.setAttribute('material', `color: ${t.color}; shader: flat; side: double; opacity: 0.5`);
             ring.setAttribute('rotation', '-90 0 0');
+            ring.setAttribute('animation', 'property: scale; to: 1.5 1.5 1.5; dir: alternate; dur: 1000; easing: easeInOutSine; loop: true');
+            ring.setAttribute('animation__fade', 'property: material.opacity; to: 0; dir: alternate; dur: 1000; easing: easeInOutSine; loop: true');
 
-            marker.appendChild(arrow);
-            marker.appendChild(ring);
+            // Assemble
+            navContainer.appendChild(arrowGroup);
+            navContainer.appendChild(textLabel);
+            navContainer.appendChild(ring);
+
+            marker.appendChild(navContainer);
             scene.appendChild(marker);
         });
-    } else {
-        console.error("A-Scene not found!");
     }
 });
