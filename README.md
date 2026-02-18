@@ -4,7 +4,7 @@ A futuristic WebVR-based Augmented Reality campus navigation interface using A-F
 You access this through https://vishhnuvardhann.github.io/CampusLens/ link
 
 ## The QR needed to scan this DAEMO is:
-
+![WhatsApp Image 2026-02-18 at 3 37 38 PM](https://github.com/user-attachments/assets/6d96e816-e080-4a47-838d-ba7712a3d1f7)
 
 ## Features
 - **Immersive AR**: Detects "Hiro" and "Kanji" markers to show 3D navigation arrows.
