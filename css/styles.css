@@ -251,3 +251,16 @@ body {
         text-shadow: 0 0 10px var(--neon-cyan);
     }
 }
+
+/* Navigation Instruction (Added missing styles) */
+.nav-instruction {
+    margin-top: 15px;
+    font-family: var(--font-heading);
+    font-size: 1.4rem;
+    color: var(--neon-blue);
+    text-align: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 10px;
+    letter-spacing: 2px;
+    animation: pulse 1.5s infinite;
+}
