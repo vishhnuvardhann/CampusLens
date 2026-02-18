@@ -24,6 +24,14 @@
     <!-- Futuristic HUD Overlay -->
     <div id="ar-hud">
 
+        <!-- Loading Screen -->
+        <div id="loader" class="loader-overlay">
+            <div class="loader-content">
+                <div class="spinner"></div>
+                <div class="loading-text">INITIALIZING SYSTEMS...</div>
+            </div>
+        </div>
+
         <!-- Top Status Bar -->
         <div class="hud-top-bar">
             <div class="system-status">
@@ -71,10 +79,13 @@
     </div>
 
     <!-- AR Scene 
-         CRITICAL: wr-mode-ui="enabled: false" and NO 'embedded' attribute 
-         to ensure full screen camera feed.
+         Quest Compatibility:
+         - embedded: true (Requested)
+         - vr-mode-ui: false (Prevent VR mode hijacking)
+         - renderer: precise
     -->
-    <a-scene vr-mode-ui="enabled: false" renderer="logarithmicDepthBuffer: true; alpha: true; precision: medium;"
+    <a-scene embedded vr-mode-ui="enabled: false"
+        renderer="logarithmicDepthBuffer: true; alpha: true; precision: medium;"
         arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;">
 
         <!-- Camera -->

@@ -67,7 +67,25 @@ AFRAME.registerComponent('campus-marker', {
 document.addEventListener('DOMContentLoaded', () => {
     console.log("CampusLens Navigation Initialized");
 
+    // Loading Handler
+    const loader = document.getElementById('loader');
     const scene = document.querySelector('a-scene');
+
+    function hideLoader() {
+        if (loader && !loader.classList.contains('hidden')) {
+            loader.classList.add('hidden');
+            console.log("System Initialized");
+        }
+    }
+
+    // Force hide loader after 3 seconds (Fallback for Quest)
+    // Quest browser sometimes doesn't fire 'loaded' event reliably for AR.js
+    setTimeout(hideLoader, 3000);
+
+    // Also listen for scene loaded
+    if (scene) {
+        scene.addEventListener('loaded', hideLoader);
+    }
 
     // Define Targets with Navigation Logic
     // Rotation: x y z (Forward=0 0 0, Right=0 -90 0, Left=0 90 0, Back=0 180 0)
