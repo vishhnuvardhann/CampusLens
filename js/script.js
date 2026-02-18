@@ -14,18 +14,20 @@ AFRAME.registerComponent('campus-marker', {
         this.locDist = document.getElementById('location-distance');
         this.navInstruction = document.getElementById('nav-instruction');
 
+        console.log(`[CampusMarker] Initialized for ${this.el.id}`);
+
         // Bind events
         this.el.addEventListener('markerFound', () => {
             const name = this.el.getAttribute('data-name');
             const dist = this.el.getAttribute('data-dist');
             const instruction = this.el.getAttribute('data-instruction');
 
-            console.log(`Target Locked: ${name}`);
+            console.log(`[CampusMarker] Target Locked: ${name}`);
             this.onMarkerFound(name, dist, instruction);
         });
 
         this.el.addEventListener('markerLost', () => {
-            console.log("Target Lost");
+            console.log(`[CampusMarker] Target Lost: ${this.el.id}`);
             this.onMarkerLost();
         });
     },
@@ -95,6 +97,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (scene) {
         targets.forEach(t => {
+            console.log(`[CampusLens] Registering marker: ${t.name} (${t.preset})`);
+
             // Create Marker
             const marker = document.createElement('a-marker');
             marker.setAttribute('preset', t.preset);
@@ -104,7 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
             marker.setAttribute('data-dist', t.dist);
             marker.setAttribute('data-instruction', t.instruction);
 
-            // Container for 3D Elements
+            // Container for 3D Elements using a wrapper entity
             const navContainer = document.createElement('a-entity');
 
             // 1. Directional Arrow (Cone + Cylinder)
@@ -114,20 +118,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Arrow Shaft
             const shaft = document.createElement('a-cylinder');
-            shaft.setAttribute('radius', '0.1');
+            shaft.setAttribute('radius', '0.05');
             shaft.setAttribute('height', '1');
             shaft.setAttribute('position', '0 0 0.5'); // Offset to align with head
             shaft.setAttribute('rotation', '90 0 0'); // Lay flat
-            shaft.setAttribute('material', `color: ${t.color}; emissive: ${t.color}; emissiveIntensity: 0.6; opacity: 0.9`);
+            shaft.setAttribute('material', `color: ${t.color}; emissive: ${t.color}; emissiveIntensity: 0.8; opacity: 0.9`);
 
             // Arrow Head
             const head = document.createElement('a-cone');
-            head.setAttribute('radius-bottom', '0.3');
+            head.setAttribute('radius-bottom', '0.2');
             head.setAttribute('radius-top', '0');
-            head.setAttribute('height', '0.6');
-            head.setAttribute('position', '0 0 -0.4'); // Tip forward
+            head.setAttribute('height', '0.5');
+            head.setAttribute('position', '0 0 -0.25'); // Tip forward
             head.setAttribute('rotation', '-90 0 0'); // Point forward
-            head.setAttribute('material', `color: ${t.color}; emissive: ${t.color}; emissiveIntensity: 0.8; opacity: 1`);
+            head.setAttribute('material', `color: ${t.color}; emissive: ${t.color}; emissiveIntensity: 1; opacity: 1`);
 
             arrowGroup.appendChild(shaft);
             arrowGroup.appendChild(head);
@@ -139,10 +143,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const textLabel = document.createElement('a-text');
             textLabel.setAttribute('value', t.instruction);
             textLabel.setAttribute('align', 'center');
-            textLabel.setAttribute('position', '0 2 0'); // Above arrow
+            textLabel.setAttribute('position', '0 1.5 0'); // Above arrow
             textLabel.setAttribute('scale', '1.5 1.5 1.5');
             textLabel.setAttribute('color', t.color);
-            textLabel.setAttribute('look-at', '[camera]'); // Always face user
+            // look-at attribute requires aframe-look-at-component
+            textLabel.setAttribute('look-at', '[camera]');
 
             // 3. Ground Pulse Ring
             const ring = document.createElement('a-ring');
@@ -161,5 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
             marker.appendChild(navContainer);
             scene.appendChild(marker);
         });
+    } else {
+        console.error("[CampusLens] a-scene not found!");
     }
 });
