@@ -3,6 +3,9 @@
 A futuristic WebVR-based Augmented Reality campus navigation interface using A-Frame and AR.js.
 You access this through https://vishhnuvardhann.github.io/CampusLens/ link
 
+## The QR needed to scan this DAEMO is:
+
+
 ## Features
 - **Immersive AR**: Detects "Hiro" and "Kanji" markers to show 3D navigation arrows.
 - **Futuristic HUD**: Glassmorphism UI with scanning reticles and neon aesthetics.
