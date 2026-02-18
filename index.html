@@ -79,17 +79,29 @@
     </div>
 
     <!-- AR Scene 
-         Quest Compatibility:
-         - embedded: true (Requested)
-         - vr-mode-ui: false (Prevent VR mode hijacking)
-         - renderer: precise
+         WebVR / WebXR Enabled:
+         - vr-mode-ui: true (Enable "Enter VR" button)
+         - webxr: dom-overlay (Keep HUD visible in VR)
+         - embedded: true (For AR.js compatibility in normal mode)
     -->
-    <a-scene embedded vr-mode-ui="enabled: false"
+    <a-scene embedded vr-mode-ui="enabled: true" webxr="optionalFeatures: dom-overlay; overlayElement: #ar-hud"
         renderer="logarithmicDepthBuffer: true; alpha: true; precision: medium;"
         arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;">
 
-        <!-- Camera -->
-        <a-entity camera></a-entity>
+        <!-- Virtual Environment (Sci-Fi Ground) -->
+        <!-- Only visible in VR/3D mode, usually AR.js camera feed overlays this in AR mode -->
+        <a-plane position="0 -1 0" rotation="-90 0 0" width="500" height="500" segments-width="50" segments-height="50"
+            material="wireframe: true; color: #00f3ff; opacity: 0.1; transparent: true">
+        </a-plane>
+
+        <!-- Camera Rig for VR Support -->
+        <a-entity id="rig" position="0 0 0">
+            <!-- Camera -->
+            <a-entity camera look-controls wasd-controls position="0 1.6 0"></a-entity>
+            <!-- Controllers (Optional, for laser interaction if needed later) -->
+            <a-entity oculus-touch-controls="hand: left"></a-entity>
+            <a-entity oculus-touch-controls="hand: right"></a-entity>
+        </a-entity>
 
         <!-- Dynamic Marker Container linked to JS -->
 
